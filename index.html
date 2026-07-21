@@ -30,7 +30,7 @@
   .modal-head{display:flex;align-items:center;justify-content:space-between;margin:-22px -24px 24px;padding:16px 24px 8px;position:sticky;top:-22px;background:var(--panel2);border-bottom:1px solid var(--border);z-index:2;}
   .modal-head h2{font-family:var(--font-head);font-size:19px;margin:0;color:var(--accent-dark);border-bottom:none;padding-bottom:0;text-transform:none;letter-spacing:normal;font-weight:700;}
   .modal-close{background:none;border:none;font-size:16px;cursor:pointer;color:var(--muted);padding:4px 9px;border-radius:6px;line-height:1;}
-  .modal-icon-btn{background:none;border:1px solid transparent;font-size:17px;cursor:pointer;color:var(--muted);padding:4px 8px;border-radius:6px;line-height:1;transition:background .15s ease,border-color .15s ease;}
+  .modal-icon-btn{background:none;border:1px solid transparent;font-size:26px;cursor:pointer;color:var(--muted);padding:4px 10px;border-radius:6px;line-height:1;transition:background .15s ease,border-color .15s ease;}
   .modal-icon-btn:hover{background:rgba(0,0,0,.06);}
   .modal-close:hover{background:var(--panel2);color:var(--text);}
   .modal-hint{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 18px;}
@@ -167,7 +167,9 @@
     100%{transform:translate(5px,0);}
   }
   .spreader-swirl{animation:spreaderSwirl .5s linear infinite;}
-  #clockHandGroup{transition:transform .2s linear;}
+  @keyframes fun-clock-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  #funClockMinuteHand{transform-origin:0 0;animation:fun-clock-spin 3s linear infinite;}
+  #funClockHourHand{transform-origin:0 0;animation:fun-clock-spin 8s linear infinite;}
   .plate-dish-group{transition:transform .8s ease-in-out,opacity .6s ease-in-out;}
   .peek-overlay{background:rgba(10,10,8,.75);}
   .peek-panel{background:#1c1a15;max-width:1150px;}
@@ -208,6 +210,9 @@
   .photo-note-input{width:100%;min-height:90px;resize:vertical;font-family:var(--font-body);font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);box-sizing:border-box;margin-bottom:12px;}
   #passageBtn:disabled{opacity:.35;cursor:default;}
   .confirm-btn{display:block;width:100%;margin-top:20px;font-family:var(--font-head);background:var(--accent);border:none;color:#fff;padding:11px 18px;border-radius:10px;cursor:pointer;font-size:14.5px;font-weight:700;box-shadow:0 2px 6px rgba(58,161,126,.3);transition:filter .15s ease,transform .15s ease,background .2s ease;}
+  .step-side-btn{display:block;width:100%;font-family:var(--font-head);background:var(--accent);border:none;color:#fff;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:700;text-align:left;box-shadow:0 2px 6px rgba(58,161,126,.3);transition:filter .15s ease,background .2s ease;}
+  .step-side-btn:disabled{opacity:.5;cursor:default;box-shadow:none;}
+  .step-side-btn.step-done{background:var(--panel2);color:var(--muted);box-shadow:none;}
   .confirm-btn:hover{filter:brightness(1.06);transform:translateY(-1px);}
   .confirm-btn:active{transform:translateY(0);}
   .confirm-btn.confirmed{background:var(--accent-dark);}
@@ -419,57 +424,73 @@
 
       <div class="group" id="createDilutionsSection" style="margin-top:22px;margin-bottom:0;display:none;">
         <h2>Create the dilution series</h2>
-        <div id="dilutionSeriesWrap" style="display:none;text-align:center;padding:6px 0 10px;overflow-x:auto;">
-          <svg id="dilutionSeriesSvg" viewBox="0 0 320 200" width="100%" style="max-width:320px;display:block;margin:0 auto;">
-            <g id="dilutionSourceTube"></g>
-            <g id="dilutionTargetTubes"></g>
-            <g id="pipetteGroup">
-              <rect x="-6" y="-75" width="12" height="50" rx="3" fill="#4a90a4"/>
-              <rect x="-4" y="-85" width="8" height="12" rx="2" fill="#f2a623"/>
-              <path id="pipetteTipShape" d="M-3,-25 L3,-25 L0.6,0 L-0.6,0 Z" fill="#cfd6d0"/>
-              <g id="pipetteTipLiquid" style="display:none;">
-                <circle cx="0" cy="-8" r="2.2" fill="#cfe8d8"/>
-              </g>
-            </g>
-          </svg>
-          <p class="hint" id="dilutionSeriesStatusText" style="margin-top:6px;margin-bottom:0;font-weight:700;"></p>
+        <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:10px;flex:0 0 auto;min-width:118px;padding-top:6px;">
+            <button id="createDilutionsBtn" class="step-side-btn">🧪 Make dilutions</button>
+            <button id="plateDilutionsBtn" class="step-side-btn" style="display:none;">🧫 Plate dilutions</button>
+          </div>
+          <div style="flex:1;min-width:220px;">
+            <div id="dilutionSeriesWrap" style="display:none;text-align:center;padding:6px 0 10px;overflow-x:auto;">
+              <svg id="dilutionSeriesSvg" viewBox="0 0 320 310" width="100%" style="max-width:320px;display:block;margin:0 auto;">
+                <g id="dilutionSourceTube"></g>
+                <g id="dilutionTargetTubes"></g>
+                <g id="plateDishesGroup"></g>
+                <g id="pipetteGroup">
+                  <rect x="-6" y="-75" width="12" height="50" rx="3" fill="#4a90a4"/>
+                  <rect x="-4" y="-85" width="8" height="12" rx="2" fill="#f2a623"/>
+                  <path id="pipetteTipShape" d="M-3,-25 L3,-25 L0.6,0 L-0.6,0 Z" fill="#cfd6d0"/>
+                  <g id="pipetteTipLiquid" style="display:none;">
+                    <circle cx="0" cy="-8" r="2.2" fill="#cfe8d8"/>
+                  </g>
+                </g>
+                <g id="spreaderOuter" style="display:none;">
+                  <g id="spreaderInner">
+                    <rect x="-2" y="-52" width="4" height="48" fill="#3a6ea5"/>
+                    <rect x="-2" y="-4" width="16" height="4" rx="1" fill="#3a6ea5"/>
+                  </g>
+                </g>
+              </svg>
+              <p class="hint" id="dilutionSeriesStatusText" style="margin-top:6px;margin-bottom:0;font-weight:700;"></p>
+            </div>
+          </div>
         </div>
-        <button id="createDilutionsBtn" class="confirm-btn" style="margin-top:10px;">🧪 Create Dilutions</button>
-      </div>
-
-      <div class="group" id="plateDilutionsSection" style="margin-top:22px;margin-bottom:0;display:none;">
-        <h2>Plate the dilutions</h2>
-        <div id="plateDishesWrap" style="display:none;text-align:center;padding:6px 0 10px;overflow-x:auto;">
-          <svg id="plateDishesSvg" viewBox="0 0 320 200" width="100%" style="max-width:320px;display:block;margin:0 auto;">
-            <g id="plateDishesGroup"></g>
-            <g id="spreaderOuter" style="display:none;">
-              <g id="spreaderInner">
-                <rect x="-2" y="-52" width="4" height="48" fill="#3a6ea5"/>
-                <rect x="-2" y="-4" width="16" height="4" rx="1" fill="#3a6ea5"/>
-              </g>
-            </g>
-          </svg>
-          <p class="hint" id="plateDilutionsStatusText" style="margin-top:6px;margin-bottom:0;font-weight:700;"></p>
-        </div>
-        <button id="plateDilutionsBtn" class="confirm-btn" style="margin-top:10px;">🧫 Plate Dilutions</button>
       </div>
 
       <div class="group" id="incubateSection" style="margin-top:22px;margin-bottom:0;display:none;">
         <h2>Incubate the plates</h2>
         <button id="incubatePlatesBtn" class="confirm-btn" style="margin-top:10px;">Incubate Plates</button>
         <div id="incubationWrap" style="display:none;text-align:center;padding:6px 0 10px;">
-          <svg id="incubatorSvg" viewBox="0 0 260 160" width="220" height="135" style="display:block;margin:0 auto;cursor:pointer;">
-            <rect x="30" y="20" width="200" height="120" rx="10" fill="#8a5a3a" stroke="#5c3a22" stroke-width="3"/>
-            <rect x="42" y="32" width="176" height="96" rx="6" fill="#2a1a10"/>
-            <circle cx="205" cy="45" r="5" fill="#e8a23a"/>
-            <g id="clockGroup" transform="translate(128,82)">
-              <circle r="34" fill="#f5f1e6" stroke="#c9bfa2" stroke-width="2"/>
-              <circle cx="0" cy="-27" r="1.6" fill="#8a7f68"/>
-              <circle cx="0" cy="27" r="1.6" fill="#8a7f68"/>
-              <circle cx="-27" cy="0" r="1.6" fill="#8a7f68"/>
-              <circle cx="27" cy="0" r="1.6" fill="#8a7f68"/>
-              <g id="clockHandGroup"><line x1="0" y1="0" x2="0" y2="-24" stroke="#3a3226" stroke-width="3" stroke-linecap="round"/></g>
-              <circle r="2.5" fill="#3a3226"/>
+          <svg id="incubatorSvg" viewBox="0 0 205 190" width="200" height="185" style="display:block;margin:0 auto;cursor:pointer;">
+            <ellipse cx="83" cy="172" rx="62" ry="6" fill="#3a3226" opacity="0.1"/>
+            <path d="M 50.0,40.0 L 50.0,160.0 Q 50.0,165.0 46.0,162.0 L 39.0,157.0 Q 35.0,154.0 35.0,149.0 L 35.0,29.0 L 50.0,40.0 Z" fill="#c4c6c4" stroke="#8e908e" stroke-width="2"/>
+            <path d="M 50.0,40.0 L 125.0,40.0 Q 130.0,40.0 126.0,37.0 L 119.0,32.0 Q 115.0,29.0 110.0,29.0 L 35.0,29.0 L 50.0,40.0 Z" fill="#eef0ee" stroke="#a8aaa8" stroke-width="2"/>
+            <rect x="50" y="40" width="80" height="125" rx="10" fill="#1c1c1c"/>
+            <path d="M58,46 L70,46 L60,155 L56,155 Z" fill="#ffffff" opacity="0.06"/>
+            <rect x="72" y="58" width="36" height="14" rx="3" fill="#0a0a0a" stroke="#3a3a3a" stroke-width="1.3"/>
+            <text x="90" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="#3ddc5a" font-family="monospace">37°C</text>
+            <circle cx="68" cy="84" r="2.6" fill="#5a5a5a"/>
+            <circle cx="78" cy="84" r="2.6" fill="#5a5a5a"/>
+            <circle cx="88" cy="84" r="3" fill="#e8a23a"/>
+            <circle cx="99" cy="84" r="2.6" fill="#5a5a5a"/>
+            <circle cx="110" cy="84" r="2.6" fill="#5a5a5a"/>
+            <path d="M64,102 Q90,96 116,102" stroke="#3a3a3a" stroke-width="1.3" fill="none" opacity="0.6"/>
+            <g id="clockGroup" transform="translate(168,100)">
+              <circle r="25" fill="#f5f1e6" stroke="#c9bfa2" stroke-width="2"/>
+              <line x1="0.0" y1="-25.0" x2="0.0" y2="-19.0" stroke="#8a7f68" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="12.5" y1="-21.7" x2="10.7" y2="-18.5" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <line x1="21.7" y1="-12.5" x2="18.5" y2="-10.7" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <line x1="25.0" y1="0.0" x2="19.0" y2="0.0" stroke="#8a7f68" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="21.7" y1="12.5" x2="18.5" y2="10.7" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <line x1="12.5" y1="21.7" x2="10.7" y2="18.5" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <line x1="0.0" y1="25.0" x2="0.0" y2="19.0" stroke="#8a7f68" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="-12.5" y1="21.7" x2="-10.7" y2="18.5" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <line x1="-21.7" y1="12.5" x2="-18.5" y2="10.7" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <line x1="-25.0" y1="0.0" x2="-19.0" y2="0.0" stroke="#8a7f68" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="-21.7" y1="-12.5" x2="-18.5" y2="-10.7" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <line x1="-12.5" y1="-21.7" x2="-10.7" y2="-18.5" stroke="#8a7f68" stroke-width="1.0" stroke-linecap="round"/>
+              <g id="funClockHourHand"><line x1="0" y1="0" x2="0" y2="-13" stroke="#3a3226" stroke-width="2.6" stroke-linecap="round"/></g>
+              <g id="funClockMinuteHand"><line x1="0" y1="0" x2="0" y2="-20" stroke="#3a3226" stroke-width="1.8" stroke-linecap="round"/></g>
+              <circle r="2.2" fill="#3a3226"/>
             </g>
           </svg>
           <p class="hint" id="incubationStatusText" style="margin-top:4px;margin-bottom:0;font-weight:700;cursor:pointer;"></p>
@@ -3498,7 +3519,7 @@ function resetCreateDilutionsStepUI(){
   dilutionSeriesWrap.style.display = "none";
   createDilutionsBtn.disabled = false;
   createDilutionsBtn.classList.remove("step-done");
-  createDilutionsBtn.innerHTML = "🧪 Create Dilutions";
+  createDilutionsBtn.innerHTML = "🧪 Make dilutions";
   dilutionSourceTubeGroup.innerHTML = "";
   dilutionTargetTubesGroup.innerHTML = "";
   pipetteGroup.style.transform = "";
@@ -3556,7 +3577,7 @@ let dilutionAnimationBusy = false;
 function setUpCreateDilutions(){
   createDilutionsBtn.disabled = true;
   createDilutionsBtn.classList.add("step-done");
-  createDilutionsBtn.innerHTML = "Create Dilutions <span class=\"unit\">done</span>";
+  createDilutionsBtn.innerHTML = "✓ Make dilutions";
   dilutionSeriesWrap.style.display = "block";
 
   const source = createDilutionTubeGroup(DILUTION_TUBE_X["0"], "Culture (10⁰)", "#efe4bd", 0.8);
@@ -3567,7 +3588,7 @@ function setUpCreateDilutions(){
   const needed = dilutionTubesNeeded();
   if (needed.length===0){
     dilutionSeriesStatusText.textContent = "✓ No further dilutions needed";
-    revealNextPlateCellsSection(plateDilutionsSection);
+    plateDilutionsBtn.style.display = "block";
     return;
   }
 
@@ -3621,7 +3642,7 @@ async function handleDilutionTubeClick(tube, needed, targetsByExp){
     dilutionSeriesStatusText.textContent = `Click ${DILUTION_LABELS[String(needed[index+1])]} to continue the series`;
   } else {
     dilutionSeriesStatusText.textContent = "✓ Dilutions created";
-    revealNextPlateCellsSection(plateDilutionsSection);
+    plateDilutionsBtn.style.display = "block";
   }
 }
 
@@ -3635,32 +3656,25 @@ createDilutionsBtn.addEventListener("click", setUpCreateDilutions);
 // surface; nothing is actually visible until colonies grow during
 // incubation (see the next step), regardless of whether "Reveal Mutants"
 // is on elsewhere in the app.
-const plateDilutionsSection = document.getElementById("plateDilutionsSection");
 const plateDilutionsBtn = document.getElementById("plateDilutionsBtn");
-const plateDishesWrap = document.getElementById("plateDishesWrap");
-const plateDishesSvg = document.getElementById("plateDishesSvg");
-const plateDilutionsStatusText = document.getElementById("plateDilutionsStatusText");
 const plateDishesGroup = document.getElementById("plateDishesGroup");
 const spreaderOuter = document.getElementById("spreaderOuter");
 const spreaderInner = document.getElementById("spreaderInner");
 
-const DISH_Y = 118; // petri dish center, in its own compact SVG now that dishes have their own section separate from the tube row
-const SPREADER_ENTRY_X = 0, SPREADER_ENTRY_Y = 20; // a fixed "off to the side" spot, well clear of every dish column, that the spreader always snaps to before animating toward its actual target
+const DISH_Y = 248; // petri dish center, well below the tube row so the pipette's travel between them is visually obvious
+const SPREADER_ENTRY_X = 0, SPREADER_ENTRY_Y = 30; // a fixed "off to the side" spot, well clear of every tube/dish column, that the spreader always snaps to before animating toward its actual target
 const DISH_R = 34;
-const PIPETTE_DISH_HOVER_Y = 75; // above the dish, pipette clear of the spreader's own working space
-const PIPETTE_DISH_TOUCH_Y = 110; // just above the agar, close enough to read as "depositing there"
-const PLATE_PIPETTE_REST_Y = 20; // resting spot once the pipette is freshly moved into this section's own SVG
-const PLATE_PIPETTE_DRAW_Y = 48; // a "drawing from the tube" dip -- the actual tube lives in the completed section above, so this just mimics the gesture at the same X as the dish it's headed to
+const PIPETTE_DISH_HOVER_Y = 205; // above the dish, pipette clear of the spreader's own working space
+const PIPETTE_DISH_TOUCH_Y = 240; // just above the agar, close enough to read as "depositing there"
 const DROP_TICK_MS = 50;
 const DROP_SPREAD_DURATION_MS = 1300;
 
 function resetPlateDilutionsStepUI(){
   plateAnimationBusy = false;
-  plateDilutionsSection.style.display = "none";
+  plateDilutionsBtn.style.display = "none";
   plateDilutionsBtn.disabled = false;
   plateDilutionsBtn.classList.remove("step-done");
-  plateDilutionsBtn.innerHTML = "🧫 Plate Dilutions";
-  plateDishesWrap.style.display = "none";
+  plateDilutionsBtn.innerHTML = "🧫 Plate dilutions";
   plateDishesGroup.innerHTML = "";
   spreaderOuter.style.display = "none";
   spreaderInner.classList.remove("spreader-swirl");
@@ -3670,9 +3684,6 @@ function resetPlateDilutionsStepUI(){
   pipetteTipShape.style.transform = "";
   pipetteTipShape.style.opacity = "";
   pipetteTipShape.style.transition = "";
-  // The pipette may currently be living in plateDishesSvg from a previous
-  // pass through this step -- move it back home for a fresh session.
-  dilutionSeriesSvg.appendChild(pipetteGroup);
   resetIncubateStepUI();
 }
 
@@ -3749,11 +3760,11 @@ function allPlateDishesSpread(){
 async function pipetteOntoDish(dish){
   const x = DILUTION_TUBE_X[String(dish.dilutionExp)];
   const label = DILUTION_LABELS[String(dish.dilutionExp)];
-  plateDilutionsStatusText.textContent = "Attaching a fresh tip...";
+  dilutionSeriesStatusText.textContent = "Attaching a fresh tip...";
   await attachFreshTip();
-  plateDilutionsStatusText.textContent = `Drawing 50 µL from ${label}...`;
-  await movePipette(x, PLATE_PIPETTE_REST_Y);  // travel to hover over this dilution's own tube
-  await movePipette(x, PLATE_PIPETTE_DRAW_Y);  // dip down to draw up 50 uL
+  dilutionSeriesStatusText.textContent = `Drawing 50 µL from ${label}...`;
+  await movePipette(x, PIPETTE_REST_Y);   // travel to hover over this dilution's own tube
+  await movePipette(x, PIPETTE_DIP_Y);    // dip down to draw up 50 uL
   pipetteTipLiquid.style.display = "block";
   await sleep(250);
   await movePipette(x, PIPETTE_DISH_TOUCH_Y); // straight down to the dish, same x
@@ -3777,19 +3788,19 @@ async function handlePlateDishClick(dish){
     plateAnimationBusy = true;
     await pipetteOntoDish(dish);
     dish.plateState = "pipetted";
-    plateDilutionsStatusText.textContent = `Click ${label} again to spread it`;
+    dilutionSeriesStatusText.textContent = `Click ${label} again to spread it`;
     plateAnimationBusy = false;
   } else if (dish.plateState === "pipetted"){
     plateAnimationBusy = true;
-    plateDilutionsStatusText.textContent = `Spreading ${label}...`;
+    dilutionSeriesStatusText.textContent = `Spreading ${label}...`;
     await animateSpreaderOnDish(DILUTION_TUBE_X[String(dish.dilutionExp)], dish);
     dish.plateState = "spread";
     plateAnimationBusy = false;
     if (allPlateDishesSpread()){
-      plateDilutionsStatusText.textContent = "✓ Plates ready to incubate";
+      dilutionSeriesStatusText.textContent = "✓ Plates ready to incubate";
       revealNextPlateCellsSection(incubateSection);
     } else {
-      plateDilutionsStatusText.textContent = "Click each remaining dish to pipette, then click it again to spread";
+      dilutionSeriesStatusText.textContent = "Click each remaining dish to pipette, then click it again to spread";
     }
   }
   // "spread" state: nothing more to do for this dish
@@ -3802,17 +3813,9 @@ async function handlePlateDishClick(dish){
 function setUpPlateDilutions(){
   plateDilutionsBtn.disabled = true;
   plateDilutionsBtn.classList.add("step-done");
-  plateDilutionsBtn.innerHTML = "Plate Dilutions <span class=\"unit\">done</span>";
-  plateDishesWrap.style.display = "block";
-  // The pipette is a single shared element that moves between whichever
-  // SVG currently needs it -- Create Dilutions leaves it behind in
-  // dilutionSeriesSvg, so it's picked up and moved into this section's
-  // own SVG here, with a fresh resting position for the new coordinate
-  // space (resetPlateDilutionsStepUI moves it back for the next session).
-  plateDishesSvg.appendChild(pipetteGroup);
-  pipetteGroup.style.transform = `translate(${DILUTION_TUBE_X["0"]}px, ${PLATE_PIPETTE_REST_Y}px)`;
+  plateDilutionsBtn.innerHTML = "✓ Plate dilutions";
   buildClickablePlateDishes();
-  plateDilutionsStatusText.textContent = "Click each dish to pipette 50 µL onto it, then click it again to spread";
+  dilutionSeriesStatusText.textContent = "Click each dish to pipette 50 µL onto it, then click it again to spread";
 }
 
 plateDilutionsBtn.addEventListener("click", setUpPlateDilutions);
@@ -3834,7 +3837,6 @@ const incubateSection = document.getElementById("incubateSection");
 const incubatePlatesBtn = document.getElementById("incubatePlatesBtn");
 const incubationWrap = document.getElementById("incubationWrap");
 const incubatorSvg = document.getElementById("incubatorSvg");
-const clockHandGroup = document.getElementById("clockHandGroup");
 const incubationStatusText = document.getElementById("incubationStatusText");
 const takeAPeekBtn = document.getElementById("takeAPeekBtn");
 const viewPlatesBtn = document.getElementById("viewPlatesBtn");
@@ -3964,7 +3966,6 @@ function buildPlateLayouts(){
 }
 
 function updateClockDisplay(){
-  clockHandGroup.style.transform = `rotate(${incubationProgress*360}deg)`;
   if (incubationDone){
     incubationStatusText.textContent = "✓ Incubation complete (24 / 24 hr) -- tap to view plates";
   } else {
