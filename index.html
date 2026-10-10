@@ -271,10 +271,19 @@
 .tally-sub{color:var(--muted);font-size:11.5px;}
 .seq-note-block{font-size:11.5px;color:var(--muted);margin:4px 0 10px;line-height:1.4;}
 .prediction-input{width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:8px;border-radius:8px;border:1px solid var(--border);resize:vertical;}
-.simplified-panel{margin-top:10px;font-size:13.5px;}
-.simplified-panel summary{cursor:pointer;font-weight:700;}
-.simplified-panel ul{margin:8px 0 0;padding-left:20px;line-height:1.5;}
-.simplified-panel li{margin-bottom:4px;}
+.simplified-panel{margin:12px auto 0;max-width:980px;font-size:13px;}
+.simplified-panel summary{cursor:pointer;font-weight:700;display:inline-block;padding:6px 14px;border-radius:20px;background:var(--panel2);border:1px solid var(--border);list-style:none;}
+.simplified-panel summary::-webkit-details-marker{display:none;}
+.simplified-panel[open] summary{margin-bottom:10px;}
+.simp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;text-align:left;}
+.simp-card{display:flex;flex-direction:column;gap:3px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.simp-head{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.simp-icon{font-size:20px;line-height:1;}
+.simp-row{font-size:12.5px;line-height:1.35;}
+.simp-row b{color:var(--accent-dark);}
+.simp-fun{font-size:12px;line-height:1.35;color:var(--muted);font-style:italic;margin-top:3px;}
+.simp-title{font-weight:700;margin-bottom:2px;}
+.simp-text{color:var(--muted);line-height:1.4;font-size:12.5px;}
 
   footer{padding:12px 24px 26px;text-align:center;color:var(--muted);font-size:12px;}
 
@@ -339,16 +348,12 @@
   <p>A simulated version of the EvolvingSTEM bead experiment. Grow a culture of bacteria and watch as they divide (binary fission). Every now and then, a mutant will arise (check "Show mutants" to see them as different colors!). These mutants can then become more or less common through selection (variants that survive and reproduce better in this environment increase) or drift (random ups and downs in frequency, strongest in small populations and at each transfer). Add beads to provide a surface for biofilm-forming mutants to attach to and observe how this selective force causes the mutant frequencies change over multiple passages. And most important... have fun!</p>
   <details class="simplified-panel">
     <summary>🔍 What's simplified in this simulation?</summary>
-    <ul>
-      <li><strong>Tiny population.</strong> A real culture tube holds billions of cells; this one holds about 1,000 so you can watch every cell.</li>
-      <li><strong>Lots of mutations.</strong> Here about 1 in every 17 divisions produces a mutation. In real bacteria it's roughly 1 in a few hundred, and helpful ones are far rarer -- that's why the real experiment needs days, not minutes.</li>
-      <li><strong>Only three biofilm genes.</strong> bmo, fuzY and wspF are real genes that EvolvingSTEM students' populations have mutated, and each uses a real mutation found in those populations. In real experiments other genes (like <em>wspA</em>, <em>yfiR</em> and <em>morA</em>) can also make wrinkly colonies.</li>
-      <li><strong>Mutations add up.</strong> Each cell keeps every mutation it inherits, but carries at most one biofilm mutation.</li>
-      <li><strong>Other mutations are examples.</strong> The neutral, slightly harmful and lethal mutations are in real kinds of genes and follow real genetic-code rules (one DNA letter changed), but the exact changes are made up.</li>
-      <li><strong>Lethal means instantly lethal.</strong> A cell with a broken essential gene fades away right after it's born. Real cells stop dividing and die more gradually.</li>
-      <li><strong>Simple stickiness.</strong> Cells stick only to the wall or to beads, not to each other, so biofilms are one cell thick.</li>
-      <li><strong>Tuned, not measured.</strong> Growth rates and stickiness are chosen so the overall pattern matches real classroom results (smooth colonies stay most common; bmo rises; wrinkly and fuzzy stay less common) -- they are not lab measurements.</li>
-    </ul>
+    <div class="simp-grid">
+      <div class="simp-card"><div class="simp-head"><span class="simp-icon" aria-hidden="true">🧫</span><span class="simp-title">Tiny population</span></div><div class="simp-row"><b>In the sim:</b> About 1,000 cells.</div><div class="simp-row"><b>In real life:</b> Billions in one tube.</div><div class="simp-row"><b>Why:</b> So you can watch every cell.</div><div class="simp-fun">💡 A real tube holds more bacteria than there are people on Earth.</div></div>
+      <div class="simp-card"><div class="simp-head"><span class="simp-icon" aria-hidden="true">🎲</span><span class="simp-title">Lots of mutations</span></div><div class="simp-row"><b>In the sim:</b> About 1 in 17 divisions.</div><div class="simp-row"><b>In real life:</b> About 1 in a few hundred.</div><div class="simp-row"><b>Why:</b> With only 1,000 cells, real rates would give almost no mutants to see.</div><div class="simp-fun">💡 A real tube has so many divisions that every DNA letter gets mutated in some cell.</div></div>
+      <div class="simp-card"><div class="simp-head"><span class="simp-icon" aria-hidden="true">🎨</span><span class="simp-title">Colorful mutants</span></div><div class="simp-row"><b>In the sim:</b> “Show mutants” colors each mutant.</div><div class="simp-row"><b>In real life:</b> Mutant cells look the same.</div><div class="simp-row"><b>Why:</b> To show hidden DNA changes that scientists find only by sequencing.</div><div class="simp-fun">💡 bmo was invisible on plates, so it was found only by sequencing.</div></div>
+      <div class="simp-card"><div class="simp-head"><span class="simp-icon" aria-hidden="true">🧬</span><span class="simp-title">Three biofilm genes</span></div><div class="simp-row"><b>In the sim:</b> Only bmo, fuzY and wspF help on beads.</div><div class="simp-row"><b>In real life:</b> Other genes (wspA, yfiR, morA) can too.</div><div class="simp-row"><b>Why:</b> These are real mutations found by EvolvingSTEM students.</div><div class="simp-fun">💡 wspF caused 33 of 57 sequenced wrinkly colonies.</div></div>
+    </div>
   </details>
 </header>
 
