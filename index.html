@@ -186,7 +186,18 @@
   .peek-panel.peek-final #peekTimerText{color:var(--accent-dark);}
   .peek-panel.peek-final .peek-dish-label{fill:var(--text);}
   .peek-panel.peek-final #photoPickHint{color:var(--accent-dark);}
-  #peekDishesRow{display:flex;gap:20px;justify-content:center;}
+  #peekDishesRow{display:flex;gap:20px;justify-content:center;align-items:flex-end;}
+  .peek-panel{display:flex;flex-direction:column;max-height:92vh;overflow:hidden;padding:14px 18px;}
+  .peek-panel .modal-head{margin-bottom:4px;}
+  .peek-panel #peekHint{margin:0 0 2px;font-size:12.5px;}
+  .peek-panel #peekTimerText{margin:0 0 4px !important;}
+  .peek-panel #peekDishesWrap{margin-top:4px !important;flex:0 0 auto;}
+  .peek-panel #colonyTallyWrap{margin-top:8px !important;overflow-y:auto;}
+  .peek-panel #colonyTallyTable{font-size:12px !important;}
+  .peek-panel #colonyTallyTable td, .peek-panel #colonyTallyTable th{padding:2px 6px !important;}
+  .peek-panel .calc-line, .peek-panel .calc-total{font-size:11px;}
+  .peek-panel .why-dilute{margin-top:6px;font-size:12px;}
+  .peek-panel #countingSavedMsg{margin:8px 0 0 !important;}
   #peekDishesRow.peek-final-row{flex-wrap:nowrap;}
   #colonyTallyTable{color:#e8e4d5;}
   #colonyTallyTable th{color:#c9c4b2;border-bottom:1px solid #3a352a;}
@@ -260,7 +271,7 @@
 .seq-more p{font-size:12px !important;color:var(--muted) !important;}
 .seq-codon{font-family:monospace;font-size:13px;letter-spacing:1px;color:var(--text);}
 .seq-changed-base{background:#fff3bf;border-bottom:2px solid #f2c200;font-weight:800;}
-.seq-status{text-align:center;font-weight:600;min-height:52px;line-height:1.4;}
+.seq-status{text-align:center;font-weight:600;min-height:84px;line-height:1.4;margin:0 0 6px;display:flex;flex-direction:column;justify-content:center;}
 .seq-step{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
 .seq-predict-btn{text-align:left !important;}
 .seq-link-btn{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:12px;cursor:pointer;display:block;margin:2px auto 0;}
@@ -269,6 +280,27 @@
 .seq-prediction-miss{background:#fdf0e6;border:1px solid #f0c39b;}
 .seq-picked{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0 8px;font-size:12px;color:var(--muted);}
 .tally-sub{color:var(--muted);font-size:11.5px;}
+.seq-mode{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:12.5px;color:var(--muted);margin:0 0 12px;}
+.seq-mode label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;}
+.seq-mode input:disabled + *, .seq-mode label:has(input:disabled){opacity:.45;cursor:not-allowed;}
+.seq-mode-hint{flex-basis:100%;margin:0;font-size:11.5px;font-style:italic;}
+.seq-next-slot{height:52px;margin-top:8px;}
+.seq-next-btn{width:100%;margin:0;}
+.pick-banner{font-weight:700;color:#fff !important;background:#1f6e55;border-radius:10px;padding:9px 12px;text-align:center;font-size:14px !important;animation:pickPulse 1.6s ease-in-out infinite;}
+@keyframes pickPulse{0%,100%{box-shadow:0 0 0 0 rgba(31,110,85,.45);}50%{box-shadow:0 0 0 6px rgba(31,110,85,0);}}
+.seq-pickable{animation:colonyGlow 1.4s ease-in-out infinite;}
+@keyframes colonyGlow{0%,100%{filter:none;}50%{filter:drop-shadow(0 0 3px #ffffff) brightness(1.15);}}
+.morph-name{font-size:12.5px;font-weight:600;}
+.why-dilute{margin-top:10px;font-size:12.5px;}
+.why-dilute summary{cursor:pointer;font-weight:700;}
+.why-dilute p{margin:6px 0 0;line-height:1.45;}
+.step-working{cursor:progress !important;opacity:.9;animation:stepWorking 1.4s ease-in-out infinite;}
+@keyframes stepWorking{0%,100%{filter:none;}50%{filter:brightness(1.08);}}
+.peek-scale{color:#c9c4b2;fill:#c9c4b2;}
+.peek-final .peek-scale{color:var(--text);fill:var(--text);}
+.seq-picking{animation:pickPulse 1.6s ease-in-out infinite;}
+.seq-cancel{font-weight:400;font-size:12px;opacity:.8;margin-left:8px;}
+.photo-prompt{font-weight:700;color:#e0b04a !important;}
 .seq-note-block{font-size:11.5px;color:var(--muted);margin:4px 0 10px;line-height:1.4;}
 .prediction-input{width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:8px;border-radius:8px;border:1px solid var(--border);resize:vertical;}
 .simplified-panel{margin:12px auto 0;max-width:980px;font-size:13px;}
@@ -460,11 +492,13 @@
       <h2>🧬 Sequencing Analysis</h2>
       <button id="closeSequencingBtn" class="modal-close" title="Close">✕</button>
     </div>
-    <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 0 14px;cursor:pointer;">
-      <input type="checkbox" id="skipSequencingAnimationToggle">
-      ⏩ Skip animation (jump straight to results)
-    </label>
-    <div id="sequencingPanelBody"></div>
+    <div id="seqModeGroup" class="seq-mode" role="radiogroup" aria-label="How to show the sequencing steps">
+      <label><input type="radio" name="seqMode" value="step" checked> 👣 Step by step</label>
+      <label><input type="radio" name="seqMode" value="auto" disabled> ▶ Play all steps</label>
+      <label><input type="radio" name="seqMode" value="skip" disabled> ⏩ Skip to results</label>
+      <p id="seqModeHint" class="seq-mode-hint">The other options unlock after your first sequencing run.</p>
+    </div>
+    <div id="sequencingPanelBody" style="min-height:420px;"></div>
   </div>
 </div>
 
@@ -665,13 +699,18 @@
     <p class="modal-hint" id="peekHint" style="color:#c9c4b2;"></p>
     <p class="hint" id="peekTimerText" style="font-weight:700;margin-top:-6px;margin-bottom:10px;"></p>
     <p class="hint" id="photoPickHint" style="display:none;font-weight:700;color:#e0b04a;"></p>
-    <p class="hint" id="sequencingPickHint" style="display:none;font-weight:700;color:#4a90a4;">Click a colony to sequence it.</p>
+    <p class="hint pick-banner" id="sequencingPickHint" style="display:none;">👆 Now click any colony on a plate to sequence it.</p>
     <div id="peekDishesWrap" style="text-align:center;overflow-x:auto;margin-top:10px;"></div>
     <div id="colonyTallyWrap" style="display:none;margin-top:18px;">
       <table id="colonyTallyTable" style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead id="colonyTallyHead"></thead>
         <tbody id="colonyTallyBody"></tbody>
       </table>
+      <details class="why-dilute">
+        <summary>🤔 Why make dilutions if we can count the 10⁰ plate?</summary>
+        <p><strong>In this simulation</strong> the tube holds only about 1,000 cells (few enough that you can actually see what's going on), so the 10⁰ plate has visible colonies that you can count.</p>
+        <p><strong>In the real experiment</strong>, a tube holds about 10<sup>9</sup> (1,000,000,000) cells per mL. The undiluted plate would be so dense with bacteria that it would look like a solid lawn, so the dilutions are necessary to get a plate that has few enough colonies that you can actually count.</p>
+      </details>
     </div>
     <p id="countingSavedMsg" style="display:none;opacity:0;transition:opacity .4s ease;font-weight:700;color:var(--accent-dark);margin:16px 0 0;">✓ Colony counts saved to your notebook.</p>
     <div style="display:flex;gap:10px;margin-top:16px;">
@@ -734,7 +773,7 @@
       <h2>💾 Save this experiment?</h2>
       <button id="closeSaveExperimentPromptBtn" class="modal-close" title="Close">✕</button>
     </div>
-    <p class="hint" style="margin-top:0;">You have unsaved colony counts, photos, sequencing results, or charts from this run. Save them to your lab notebook as their own labeled experiment before starting a new one, or discard them.</p>
+    <p class="hint" style="margin-top:0;">Your results from this experiment will be saved to your lab notebook under the name below (already filled in for you -- change it if you like). Save them before starting a new one, or discard them.</p>
     <label class="ctrl-head" style="display:block;margin-bottom:4px;"><span class="lbl">Experiment name</span></label>
     <input type="text" id="saveExperimentNameInput" class="notebook-download-input" style="margin-bottom:12px;" autocomplete="off" spellcheck="false">
     <label class="ctrl-head" style="display:block;margin-bottom:4px;"><span class="lbl">Notes</span></label>
@@ -1952,6 +1991,7 @@ function initFreshRun(){
   activeParams = snapshotActiveParams();
   totalDivisions = activeParams.divisionsAtStart;
   if (!activeParams.passageStart){
+    currentSeries = { beads: !!activeParams.addBeads, mutantsSeen: false };
     // A genuinely fresh start, not a passage-triggered continuation --
     // belongs to a new series of its own, so the passage history/counter
     // (see recordPassageHistory) restarts from Passage 1 rather than
@@ -2833,6 +2873,27 @@ function drawCulture(){
   if (showMutants) flashes.forEach(f=>{ if (!layerBeadFor(f.cell)) drawFlash(f); });
 
   ctx.restore(); // matches the logical-stage projection opened at the top
+  drawCellScaleBar(ctx, w, h, dispScale);
+}
+
+// Scale bar for the tube view. Each drawn cell is ~2 µm across, about the
+// length of a real P. fluorescens cell, so the bar is to scale for CELLS.
+// The tube itself is drawn far smaller than a real one (a real tube is
+// ~1.5 cm wide), which the second line says.
+const CELL_UM = 2;
+function drawCellScaleBar(ctx, w, h, dispScale){
+  const pxPerUm = (BACTERIUM_RADIUS*2/CELL_UM) * dispScale;
+  const len = 10*pxPerUm, x0 = 14, y0 = h - 30;
+  ctx.save();
+  ctx.strokeStyle = "#3a3226"; ctx.fillStyle = "#3a3226"; ctx.lineWidth = 3; ctx.lineCap = "butt";
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0+len, y0); ctx.stroke();
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(x0, y0-5); ctx.lineTo(x0, y0+5); ctx.moveTo(x0+len, y0-5); ctx.lineTo(x0+len, y0+5); ctx.stroke();
+  ctx.font = "700 12px system-ui, sans-serif"; ctx.textBaseline = "bottom";
+  ctx.fillText("10 µm", x0, y0-6);
+  ctx.font = "11px system-ui, sans-serif"; ctx.textBaseline = "top"; ctx.fillStyle = "#6b6252";
+  ctx.fillText("cells to scale (tube is not)", x0, y0+7);
+  ctx.restore();
 }
 
 // Rounds a raw axis step up to the nearest "nice" value (1, 2, or 5 times a
@@ -3194,6 +3255,7 @@ function runSimulation(){
 
 function tick(){
   if (!playing) return;
+  if (showMutants) currentSeries.mutantsSeen = true;
   // Each rendered frame is assumed to represent this FIXED nominal slice
   // of real time (NOMINAL_FRAME_DT) rather than measuring actual elapsed
   // time between frames -- see NOMINAL_FRAME_DT's own comment for why.
@@ -3928,11 +3990,10 @@ confirmPassageBtn.addEventListener("click", ()=>{
     predictionNotebookList.push({ id: predictionIdCounter, label: `Before Passage ${passageHistory.length+2}`, text: predictionText });
     passagePredictionInput.value = "";
   }
-  recordPassageHistory(); // the OUTGOING culture's composition, captured before anything below replaces it
-  renderLabNotebook();
-
+  try { recordPassageHistory(); } catch (err){ console.error(err); } // the OUTGOING culture's composition
   closePassageDialog();
   runSimulation(); // consumes pendingPassage via snapshotActiveParams() inside initFreshRun()
+  if (predictionText){ try { renderLabNotebook(); } catch (err){ console.error(err); } }
 });
 
 
@@ -4414,6 +4475,34 @@ function addBeadsToTube(tubeGroup){
   });
 }
 
+// The "Culture (10⁰)" tube that arrives from the vortexer keeps the EXACT
+// cell arrangement the student just vortexed -- same number of dots, same
+// colors, same relative positions -- so the tube that lands is visibly the
+// same tube rather than a freshly drawn one with its own dot layout.
+// The two boxes below are the full on-screen extents of each tube group as
+// drawn in the markup (vortex tube: x 82..118, y 18..180; dilution tube:
+// x -13..13, y 0..123). The traveling clone is scaled between exactly
+// these two boxes, so mapping the dots the same way makes the hand-off
+// land dot-for-dot.
+const VORTEX_TUBE_BOX = { x0:82, x1:118, y0:18, y1:180 };
+const DILUTION_TUBE_BOX = { x0:-13, x1:13, y0:0, y1:123 };
+function addVortexMatchedDotsToTube(tubeGroup){
+  const dots = Array.from(vortexCellDotsGroup.children);
+  if (dots.length === 0) return false; // no vortex step to carry over -- caller falls back
+  const sx = (DILUTION_TUBE_BOX.x1-DILUTION_TUBE_BOX.x0)/(VORTEX_TUBE_BOX.x1-VORTEX_TUBE_BOX.x0);
+  const sy = (DILUTION_TUBE_BOX.y1-DILUTION_TUBE_BOX.y0)/(VORTEX_TUBE_BOX.y1-VORTEX_TUBE_BOX.y0);
+  dots.forEach(dot=>{
+    const vx = Number(dot.getAttribute("cx")), vy = Number(dot.getAttribute("cy"));
+    tubeGroup.dotsGroup.appendChild(svgEl("circle", {
+      cx: DILUTION_TUBE_BOX.x0 + (vx-VORTEX_TUBE_BOX.x0)*sx,
+      cy: DILUTION_TUBE_BOX.y0 + (vy-VORTEX_TUBE_BOX.y0)*sy,
+      r: Number(dot.getAttribute("r") || 4)*(sx+sy)/2,
+      fill: dot.getAttribute("fill")
+    }));
+  });
+  return true;
+}
+
 function addDotsToTube(tubeGroup, colors){
   colors.forEach((color,i)=>{
     const slot = DILUTION_DOT_SLOTS[i];
@@ -4438,12 +4527,12 @@ function resetCreateDilutionsStepUI(){
   autoPlateActive = false;
   autoVortexActive = false;
   autoPlateBtn.disabled = false;
-  autoPlateBtn.classList.remove("step-done");
+  clearStepState(autoPlateBtn);
   autoPlateBtn.innerHTML = "⚡ Auto-plate";
   createDilutionsSection.style.display = "none";
   dilutionSeriesWrap.style.display = "none";
   createDilutionsBtn.disabled = false;
-  createDilutionsBtn.classList.remove("step-done");
+  clearStepState(createDilutionsBtn);
   createDilutionsBtn.innerHTML = "🧪 Make dilutions";
   dilutionSourceTubeGroup.innerHTML = "";
   dilutionTargetTubesGroup.innerHTML = "";
@@ -4602,7 +4691,13 @@ async function runAutoPlateFromHere(){
     const needed = tubes.map(t=>t.dilutionExp);
     const targetsByExp = {};
     tubes.forEach(t=> targetsByExp[t.dilutionExp]=t);
-    for (const exp of needed) await handleDilutionTubeClick(targetsByExp[exp], needed, targetsByExp);
+    for (const exp of needed){
+      const tube = targetsByExp[exp];
+      for (let tries=0; tube.dilutionState!=="filled" && tries<20; tries++){
+        while (dilutionAnimationBusy) await sleep(100);
+        await handleDilutionTubeClick(tube, needed, targetsByExp);
+      }
+    }
   }
 
   // Same idea for "Plate dilutions" -- only reachable/visible once
@@ -4611,7 +4706,12 @@ async function runAutoPlateFromHere(){
 
   if (plateDishesGroup.children.length > 0){
     const dishes = Array.from(plateDishesGroup.children);
-    for (const dish of dishes){ await handlePlateDishClick(dish); await handlePlateDishClick(dish); }
+    for (const dish of dishes){
+      for (let tries=0; dish.plateState!=="spread" && tries<20; tries++){
+        while (plateAnimationBusy) await sleep(100);
+        await handlePlateDishClick(dish);
+      }
+    }
   }
 
   // Same idea for "Incubate Plates" -- only reachable once every dish has
@@ -4634,10 +4734,15 @@ async function runAutoPlateFromHere(){
 
 autoPlateBtn.addEventListener("click", ()=>{
   autoPlateActive = true;
-  autoPlateBtn.disabled = true;
-  autoPlateBtn.classList.add("step-done");
-  autoPlateBtn.innerHTML = "✓ Auto-plate";
-  runAutoPlateFromHere();
+  markStepWorking(autoPlateBtn, "⏳ Auto-plating…");
+  runAutoPlateFromHere().then(()=>{
+    autoPlateActive = false;
+    markStepDone(autoPlateBtn, "✓ Auto-plate");
+  }).catch(err=>{
+    console.error(err);
+    autoPlateActive = false;
+    clearStepState(autoPlateBtn); autoPlateBtn.disabled = false; autoPlateBtn.innerHTML = "⚡ Auto-plate";
+  });
 });
 
 // This button's own job is just revealing the source tube and the empty
@@ -4781,31 +4886,67 @@ function morphVortexTubeIntoCultureTube(destinationTube){
     // tube fading in somewhere else.
     const ease = t=> t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2, 2)/2;
     const t0 = performance.now();
-    function frame(now){
-      const t = Math.min(1, (now-t0)/MORPH_MS), k = ease(t);
-      const end = destinationTube.visualGroup.getBoundingClientRect();
-      clone.style.left = (startRect.left + (end.left-startRect.left)*k) + "px";
-      clone.style.top = (startRect.top + (end.top-startRect.top)*k) + "px";
-      clone.style.width = (startRect.width + (end.width-startRect.width)*k) + "px";
-      clone.style.height = (startRect.height + (end.height-startRect.height)*k) + "px";
-      if (t < 1){ requestAnimationFrame(frame); return; }
+    let settled = false;
+    function finish(){
+      if (settled) return;
+      settled = true;
+      clearTimeout(guard);
       destinationTube.style.transition = "none";
       destinationTube.style.opacity = "1";
-      requestAnimationFrame(()=>{ clone.remove(); resolve(); });
+      if (clone.parentNode) clone.remove();
+      resolve();
+    }
+    // Backstop: if a frame callback never arrives (background tab) or one
+    // throws, the hand-off still completes instead of leaving the step
+    // stuck with an invisible tube.
+    const guard = setTimeout(finish, MORPH_MS + 1200);
+    function frame(now){
+      if (settled) return;
+      try {
+        const t = Math.min(1, (now-t0)/MORPH_MS), k = ease(t);
+        const end = destinationTube.visualGroup.getBoundingClientRect();
+        clone.style.left = (startRect.left + (end.left-startRect.left)*k) + "px";
+        clone.style.top = (startRect.top + (end.top-startRect.top)*k) + "px";
+        clone.style.width = (startRect.width + (end.width-startRect.width)*k) + "px";
+        clone.style.height = (startRect.height + (end.height-startRect.height)*k) + "px";
+        if (t < 1){ requestAnimationFrame(frame); return; }
+        finish();
+      } catch (err){ console.error("tube hand-off", err); finish(); }
     }
     requestAnimationFrame(frame);
   });
 }
 
+// Step buttons: "working" while a step is in progress (disabled, not
+// faded), and the ✓ + faded "done" look only once it has actually finished.
+function markStepWorking(btn, html){ btn.disabled = true; btn.classList.remove("step-done"); btn.classList.add("step-working"); btn.innerHTML = html; }
+function markStepDone(btn, html){ btn.disabled = true; btn.classList.remove("step-working"); btn.classList.add("step-done"); btn.innerHTML = html; }
+function clearStepState(btn){ btn.classList.remove("step-working", "step-done"); }
+
 async function setUpCreateDilutions(){
-  createDilutionsBtn.disabled = true;
-  createDilutionsBtn.classList.add("step-done");
-  createDilutionsBtn.innerHTML = "✓ Make dilutions";
+  markStepWorking(createDilutionsBtn, "⏳ Making dilutions…");
   dilutionSeriesWrap.style.display = "block";
+  dilutionSeriesStatusText.textContent = "Carrying the tube over from the vortexer...";
+  try {
+  return await setUpCreateDilutionsInner();
+  } catch (err){
+    // Never leave the step stuck: let the student simply click again.
+    console.error("Make dilutions", err);
+    clearStepState(createDilutionsBtn);
+    createDilutionsBtn.disabled = false;
+    createDilutionsBtn.innerHTML = "🧪 Make dilutions";
+    dilutionSeriesStatusText.textContent = "Something went wrong -- click “Make dilutions” to try again.";
+  }
+}
+async function setUpCreateDilutionsInner(){
 
   const source = createDilutionTubeGroup(DILUTION_TUBE_X["0"], "Culture (10⁰)", "#efe4bd", 0.8);
   dilutionSourceTubeGroup.appendChild(source);
-  addDotsToTube(source, pickRepresentativeDotColors(pendingPlatingSession.population, DILUTION_DOT_SLOTS.length));
+  // Carry the vortexed arrangement over; only fall back to the generic
+  // dot slots if there are somehow no vortex dots to copy.
+  if (!addVortexMatchedDotsToTube(source)){
+    addDotsToTube(source, pickRepresentativeDotColors(pendingPlatingSession.population, DILUTION_DOT_SLOTS.length));
+  }
   addBeadsToTube(source);
   // Hidden immediately, not just once morphVortexTubeIntoCultureTube
   // itself runs -- there can now be a real (if usually brief) wait for
@@ -4815,6 +4956,13 @@ async function setUpCreateDilutions(){
   source.style.opacity = "0";
   pipetteGroup.style.transform = `translate(${DILUTION_TUBE_X["0"]}px, ${PIPETTE_REST_Y}px)`;
   await waitForScrollSettle(1500, source.visualGroup); // waits for BOTH page and dialog scrolling to finish before the tube takes off
+  // The "Culture (10⁰)" slot often starts below the visible part of the
+  // dialog. Bring it into view FIRST (scrolling only as far as needed, so
+  // the vortexer stays visible where possible), wait for that scroll to
+  // finish, and only then fly the tube -- otherwise it flies off-screen
+  // and the view scrolls back to it afterwards.
+  source.visualGroup.scrollIntoView({ behavior:"smooth", block:"nearest" });
+  await waitForScrollSettle(1500, source.visualGroup);
   await morphVortexTubeIntoCultureTube(source);
   // Extending the SVG's viewBox to give the pipette room to actually
   // render (see its own comment, near the <svg> tag) made the whole
@@ -4839,8 +4987,9 @@ async function setUpCreateDilutions(){
   const needed = dilutionTubesNeeded();
   if (needed.length===0){
     dilutionSeriesStatusText.textContent = "✓ No further dilutions needed";
+    markStepDone(createDilutionsBtn, "✓ Make dilutions");
     plateDilutionsBtn.style.display = "block";
-    source.scrollIntoView({ behavior:"smooth", block:"center" });
+    source.scrollIntoView({ behavior:"smooth", block:"nearest" });
     return;
   }
 
@@ -4850,13 +4999,13 @@ async function setUpCreateDilutions(){
     tube.dilutionExp = exp;
     tube.dilutionState = "empty";
     tube.style.cursor = "pointer";
-    tube.addEventListener("click", ()=> handleDilutionTubeClick(tube, needed, targetsByExp));
+    tube.addEventListener("click", ()=>{ if (!autoPlateActive) handleDilutionTubeClick(tube, needed, targetsByExp); });
     dilutionTargetTubesGroup.appendChild(tube);
     targetsByExp[exp] = tube;
   });
 
   dilutionSeriesStatusText.textContent = `Click ${DILUTION_LABELS[String(needed[0])]} to draw from the culture`;
-  source.scrollIntoView({ behavior:"smooth", block:"center" });
+  source.scrollIntoView({ behavior:"smooth", block:"nearest" });
 }
 
 async function handleDilutionTubeClick(tube, needed, targetsByExp){
@@ -4903,6 +5052,7 @@ async function handleDilutionTubeClick(tube, needed, targetsByExp){
     dilutionSeriesStatusText.textContent = `Click ${DILUTION_LABELS[String(needed[index+1])]} to continue the series`;
   } else {
     dilutionSeriesStatusText.textContent = "✓ Dilutions created";
+    markStepDone(createDilutionsBtn, "✓ Make dilutions");
     plateDilutionsBtn.style.display = "block";
   }
 }
@@ -4934,7 +5084,7 @@ function resetPlateDilutionsStepUI(){
   plateAnimationBusy = false;
   plateDilutionsBtn.style.display = "none";
   plateDilutionsBtn.disabled = false;
-  plateDilutionsBtn.classList.remove("step-done");
+  clearStepState(plateDilutionsBtn);
   plateDilutionsBtn.innerHTML = "🧫 Plate dilutions";
   plateDishesGroup.innerHTML = "";
   spreaderOuter.style.display = "none";
@@ -5009,13 +5159,14 @@ function buildClickablePlateDishes(){
     dish.plateState = "empty"; // empty -> pipetted -> spread
     dish.dilutionExp = exp;
     dish.style.cursor = "pointer";
-    dish.addEventListener("click", ()=> handlePlateDishClick(dish));
+    dish.addEventListener("click", ()=>{ if (!autoPlateActive) handlePlateDishClick(dish); });
     plateDishesGroup.appendChild(dish);
   });
 }
 
 function allPlateDishesSpread(){
-  return Array.from(plateDishesGroup.children).every(g=> g.plateState === "spread");
+  const dishes = Array.from(plateDishesGroup.children);
+  return dishes.length > 0 && dishes.every(g=> g.plateState === "spread");
 }
 
 async function pipetteOntoDish(dish){
@@ -5044,6 +5195,7 @@ async function pipetteOntoDish(dish){
 // already been fully spread.
 async function handlePlateDishClick(dish){
   if (plateAnimationBusy) return;
+  if (dish.parentNode !== plateDishesGroup) return; // a stale dish from an earlier plating session
   const label = DILUTION_LABELS[String(dish.dilutionExp)];
   if (dish.plateState === "empty"){
     plateAnimationBusy = true;
@@ -5059,6 +5211,7 @@ async function handlePlateDishClick(dish){
     plateAnimationBusy = false;
     if (allPlateDishesSpread()){
       dilutionSeriesStatusText.textContent = "✓ Plates ready to incubate";
+      markStepDone(plateDilutionsBtn, "✓ Plate dilutions");
       revealNextPlateCellsSection(incubateSection);
     } else {
       dilutionSeriesStatusText.textContent = "Click each remaining dish to pipette, then click it again to spread";
@@ -5072,9 +5225,7 @@ async function handlePlateDishClick(dish){
 // task (see handlePlateDishClick), tracked per dish rather than by this
 // button staying enabled.
 function setUpPlateDilutions(){
-  plateDilutionsBtn.disabled = true;
-  plateDilutionsBtn.classList.add("step-done");
-  plateDilutionsBtn.innerHTML = "✓ Plate dilutions";
+  markStepWorking(plateDilutionsBtn, "⏳ Plating…");
   buildClickablePlateDishes();
   // Same reasoning as the dilution tubes' own scroll fix (see
   // setUpCreateDilutions) -- the dishes sit even lower in this same tall
@@ -5417,14 +5568,39 @@ async function runIncubatePlatesAnimation(){
   startIncubationTimer();
 }
 
+// Largest dish radius that lets every dish sit side by side AND leaves
+// room for the heading, hints, colony table and buttons -- so the whole
+// View Plates window fits on screen without scrolling.
+// Worked out once per view (and cached) so the dishes don't resize while
+// the student is counting colonies; cleared when the window opens or is
+// resized.
+let peekDishR = null;
+function peekDishRadius(){
+  if (peekDishR !== null) return peekDishR;
+  const n = Math.max(1, (pendingPlatingSession && pendingPlatingSession.dilutions.length) || 1);
+  const panel = peekOverlay.querySelector(".peek-panel");
+  const panelW = (panel && panel.clientWidth) || Math.min(1150, window.innerWidth-40);
+  // Each dish is drawn in a box 2r+20 wide (2r+50 tall, incl. its label),
+  // with a 20px gap between dishes.
+  const byWidth = ((panelW - 36) - 20*n - 20*(n-1)) / (2*n);
+  // Vertical budget: the panel is capped at 92vh. Space for the colony
+  // table is reserved up front once the plates are finished, so the
+  // dishes keep the same size when counting starts.
+  const reserveForTable = incubationDone ? 200 : 0;
+  const byHeight = (window.innerHeight*0.92 - 110 - reserveForTable - 60 - 50) / 2;
+  peekDishR = Math.max(55, Math.min(PEEK_DISH_R, byWidth, byHeight));
+  return peekDishR;
+}
+
 function renderPeekDishes(progress){
   peekDishesWrap.innerHTML = "";
+  if (!pendingPlatingSession) return;
   const row = document.createElement("div");
   row.id = "peekDishesRow";
   if (incubationDone) row.classList.add("peek-final-row");
-  const dishR = PEEK_DISH_R;
+  const dishR = peekDishRadius();
   const size = dishR*2+20;
-  pendingPlatingSession.dilutions.slice().sort((a,b)=>b-a).forEach(exp=>{
+  pendingPlatingSession.dilutions.slice().sort((a,b)=>b-a).forEach((exp, di)=>{
     const svg = svgEl("svg", { viewBox:`0 0 ${size} ${size+30}`, width:size, height:size+30 });
     const cx = dishR+10, cy = dishR+10;
     svg.appendChild(svgEl("circle", { cx, cy, r:dishR, fill:"#242422" }));
@@ -5436,9 +5612,10 @@ function renderPeekDishes(progress){
     svg.appendChild(agar);
     const colonies = (pendingPlatingSession.plateLayouts && pendingPlatingSession.plateLayouts[exp]) || [];
     colonies.forEach(col=>{
-      const r = colonyRadiusAtProgress(col, progress);
+      const k = dishR/PEEK_DISH_R; // colony positions/sizes are stored against the full-size dish
+      const r = colonyRadiusAtProgress(col, progress)*k;
       if (r<=0.15) return;
-      const x = cx+col.x, y = cy+col.y;
+      const x = cx+col.x*k, y = cy+col.y*k;
       const colors = colonyDisplayColors(col.key);
       const shapeEl = colonyShapeEl(col.shape, col.blobPath, x, y, r, col.rotation, colors, col.shape==="circle" ? 0.8 : 1);
       if (countingMode){
@@ -5451,9 +5628,18 @@ function renderPeekDishes(progress){
       }
       svg.appendChild(shapeEl);
       if (countingMode && col.counted){
-        svg.appendChild(svgEl("circle", { cx:x, cy:y, r:r+2, fill:"none", stroke:"#2a6ea0", "stroke-width":1.4, "stroke-dasharray":"2,2", class:"counted-ring" }));
+        svg.appendChild(svgEl("circle", { cx:x, cy:y, r:r+2*k, fill:"none", stroke:"#2a6ea0", "stroke-width":1.4, "stroke-dasharray":"2,2", class:"counted-ring" }));
       }
     });
+    if (di === 0){
+      // A standard petri dish is 9 cm across, so 1 cm = (2 x dish radius)/9.
+      const cm = (2*dishR)/9, bx = 8, by = size+10;
+      svg.appendChild(svgEl("line", { x1:bx, y1:by, x2:bx+cm, y2:by, stroke:"currentColor", "stroke-width":3, class:"peek-scale" }));
+      svg.appendChild(svgEl("line", { x1:bx, y1:by-4, x2:bx, y2:by+4, stroke:"currentColor", "stroke-width":1.5, class:"peek-scale" }));
+      svg.appendChild(svgEl("line", { x1:bx+cm, y1:by-4, x2:bx+cm, y2:by+4, stroke:"currentColor", "stroke-width":1.5, class:"peek-scale" }));
+      const st = svgEl("text", { x:bx, y:by+15, "font-size":11, "font-weight":700, class:"peek-scale" }); st.textContent = "1 cm";
+      svg.appendChild(st);
+    }
     const text = svgEl("text", { x:cx, y:size+20, "text-anchor":"middle", "font-size":13, "font-weight":700, class:"peek-dish-label" });
     text.textContent = DILUTION_LABELS[String(exp)];
     svg.appendChild(text);
@@ -5467,10 +5653,12 @@ function updatePeekTimerText(){
 }
 
 function openPeekModal(){
+  peekDishR = null; // re-fit for this view (the colony table only exists once plates are final)
   const isFinal = incubationDone;
   peekOverlay.classList.toggle("peek-final", isFinal);
   peekOverlay.querySelector(".peek-panel").classList.toggle("peek-final", isFinal);
   peekHeading.textContent = isFinal ? "🔬 View Plates" : "👀 Taking a peek";
+  delete peekHint.dataset.orig; peekHint.classList.remove("photo-prompt");
   peekHint.textContent = isFinal
     ? (countingFinished
         ? "Colony counts saved. You can now sequence a colony to see what's actually in it."
@@ -5496,7 +5684,7 @@ function closePeekModal(){
   peekOverlay.style.display = "none";
   if (peekLiveInterval){ clearInterval(peekLiveInterval); peekLiveInterval = null; }
   photoPickMode = false;
-  photoPickHint.style.display = "none";
+  setPhotoPrompt(false);
   takePictureBtn.classList.remove("active-toggle");
   // sequencingPickMode is deliberately NOT reset here -- pickColonyToSequence
   // calls this on its way to opening the sequencing panel, and the whole
@@ -5639,8 +5827,7 @@ function estimateMathHtml(perDish){
 // rather than as static HTML.
 function buildTallyTableHead(theadEl, selected){
   const tr = document.createElement("tr");
-  tr.innerHTML = `<th style="text-align:left;padding:5px 8px;width:72px;">Phenotype</th>` +
-    (showMutants ? `<th style="text-align:left;padding:5px 8px;width:170px;">Genotype</th>` : "") +
+  tr.innerHTML = `<th style="text-align:left;padding:5px 8px;width:150px;">Phenotype</th>` +
     selected.map(exp=>`<th style="padding:5px 8px;width:56px;">${DILUTION_LABELS[String(exp)]}</th>`).join("") +
     `<th style="padding:5px 8px;">Estimated cell density in original culture</th>`;
   theadEl.innerHTML = "";
@@ -5654,20 +5841,22 @@ function buildTallyRows(bodyEl, selected, tally){
     const tr = document.createElement("tr");
     const iconTd = document.createElement("td");
     iconTd.style.padding = "4px 8px";
-    iconTd.appendChild(buildPhenotypeIcon(group.iconKey, 34));
-    tr.appendChild(iconTd);
-    if (showMutants){
-      const genotypeTd = document.createElement("td");
-      genotypeTd.style.padding = "4px 8px";
-      genotypeTd.style.textAlign = "left";
-      if (group.genotypeNote){
-        genotypeTd.innerHTML = `<span class="lineage-dot" style="background:${GENOTYPE_COLOR_BY_KEY.WT.fill}"></span>${group.genotypeNote}`;
-      } else {
-        const key = group.keys[0];
-        genotypeTd.innerHTML = `<span class="lineage-dot" style="background:${GENOTYPE_COLOR_BY_KEY[key].fill}"></span>${lineageDisplayName(key)}`;
-      }
-      tr.appendChild(genotypeTd);
+    iconTd.style.whiteSpace = "nowrap";
+    const iconWrap = document.createElement("span");
+    iconWrap.style.display = "inline-flex"; iconWrap.style.alignItems = "center"; iconWrap.style.gap = "6px";
+    iconWrap.appendChild(buildPhenotypeIcon(group.iconKey, 34));
+    // With mutants hidden, rows are the three colony looks. With mutants
+    // shown, rows are per lineage, so the row names itself ("Smooth (bmo)")
+    // and no separate genotype column is needed.
+    const morphName = { smooth:"Smooth", wrinkly:"Wrinkly", fuzzy:"Fuzzy", WT:"Smooth", bmo:"Smooth", wsp:"Wrinkly", fuzY:"Fuzzy" }[group.id];
+    const lineage = { WT:"wild-type or neutral", bmo:"bmo", wsp:"wspF", fuzY:"fuzY" }[group.id];
+    if (morphName){
+      const nm = document.createElement("span"); nm.className = "morph-name";
+      nm.innerHTML = showMutants && lineage ? `${morphName} <span class="tally-sub">(${lineage})</span>` : morphName;
+      iconWrap.appendChild(nm);
     }
+    iconTd.appendChild(iconWrap);
+    tr.appendChild(iconTd);
     selected.forEach(exp=>{
       const td = document.createElement("td");
       td.textContent = t.perDish[exp] || 0;
@@ -5797,16 +5986,17 @@ function renderLabNotebook(){
   experimentBlocksContainer.innerHTML = "";
 
   savedExperiments.forEach(exp=>{
-    renderExperimentBlock(experimentBlocksContainer, exp.name, exp.notes, exp, false);
+    try { renderExperimentBlock(experimentBlocksContainer, exp.name, exp.notes, exp, false); }
+    catch (err){ console.error("Notebook entry could not be drawn", err); }
   });
 
-  renderExperimentBlock(experimentBlocksContainer, "Current experiment (not yet saved)", "", {
+  try { renderExperimentBlock(experimentBlocksContainer, `${autoExperimentName()} (current)`, "", {
     colonyCounts: colonyCountNotebookList,
     photos: photoNotebookList,
     sequencing: sequencingNotebookList,
     mutantFreqCharts: mutantFreqNotebookList,
     predictions: predictionNotebookList
-  }, true);
+  }, true); } catch (err){ console.error("Notebook entry could not be drawn", err); }
 
   const hasAnything = savedExperiments.length > 0 || currentExperimentHasUnsavedData();
   labNotebookSection.style.display = hasAnything ? "block" : "none";
@@ -5822,8 +6012,22 @@ const saveExperimentNotesInput = document.getElementById("saveExperimentNotesInp
 const confirmSaveExperimentBtn = document.getElementById("confirmSaveExperimentBtn");
 const discardExperimentBtn = document.getElementById("discardExperimentBtn");
 
+// What the current experiment was, in a few words -- used to auto-fill
+// its notebook name (e.g. "Experiment 2: beads, mutants shown, 5 passages").
+// mutantsSeen is set only while the run is actually PLAYING with "Show
+// mutants" on, so ticking the box just before starting the next
+// experiment doesn't mislabel the one being saved.
+let currentSeries = { beads:false, mutantsSeen:false };
+function autoExperimentName(){
+  const n = savedExperiments.length + 1;
+  const passes = passageHistory.length + 1;
+  const parts = [currentSeries.beads ? "beads" : "no beads"];
+  if (currentSeries.mutantsSeen) parts.push("mutants shown");
+  parts.push(`${passes} passage${passes===1?"":"s"}`);
+  return `Experiment ${n}: ${parts.join(", ")}`;
+}
 function openSaveExperimentPrompt(){
-  saveExperimentNameInput.value = `Experiment ${savedExperiments.length+1}`;
+  saveExperimentNameInput.value = autoExperimentName();
   saveExperimentNotesInput.value = "";
   saveExperimentPromptOverlay.style.display = "flex";
 }
@@ -5993,14 +6197,15 @@ function currentPassageLabel(){
 // rendering, frozen at whatever progress was captured -- used only for
 // notebook thumbnails, so it doesn't need click handlers or counted-ring
 // overlays the way the live peek dishes do.
-function buildDishThumbnailSvg(exp, progress, dishR){
+function buildDishThumbnailSvg(exp, progress, dishR, savedColonies){
   const scale = dishR/PEEK_DISH_R;
   const size = dishR*2+8;
   const svg = svgEl("svg", { viewBox:`0 0 ${size} ${size}`, width:size, height:size });
   const cx = dishR+4, cy = dishR+4;
   svg.appendChild(svgEl("circle", { cx, cy, r:dishR, fill:"#242422" }));
   svg.appendChild(svgEl("circle", { cx, cy, r:dishR-3, fill:"#d4a468" }));
-  const colonies = (pendingPlatingSession.plateLayouts && pendingPlatingSession.plateLayouts[exp]) || [];
+  const colonies = savedColonies
+    || (pendingPlatingSession && pendingPlatingSession.plateLayouts && pendingPlatingSession.plateLayouts[exp]) || [];
   colonies.forEach(col=>{
     const r = colonyRadiusAtProgress(col, progress)*scale;
     if (r<=0.15) return;
@@ -6017,7 +6222,7 @@ function renderPhotoEntriesInto(container, list){
     const card = document.createElement("div");
     card.className = "photo-entry-card";
     const thumbWrap = document.createElement("div");
-    thumbWrap.appendChild(buildDishThumbnailSvg(entry.exp, entry.progress, 45));
+    thumbWrap.appendChild(buildDishThumbnailSvg(entry.exp, entry.progress, 45, entry.colonies));
     const caption = document.createElement("p");
     caption.className = "photo-entry-card-caption";
     caption.textContent = entry.autoCaption;
@@ -6037,12 +6242,16 @@ let pendingPhotoCapture = null;
 
 function capturePhoto(exp){
   const hours = incubationProgress*24;
+  // Snapshot of this dish's colonies, so the photo never depends on the
+  // live plating session (which is cleared when a new experiment starts).
+  const layout = (pendingPlatingSession && pendingPlatingSession.plateLayouts && pendingPlatingSession.plateLayouts[exp]) || [];
   pendingPhotoCapture = {
     exp, progress: incubationProgress,
+    colonies: layout.map(c=>({ x:c.x, y:c.y, finalRadius:c.finalRadius, key:c.key, shape:c.shape, blobPath:c.blobPath, rotation:c.rotation, visibleAt:c.visibleAt })),
     autoCaption: `${currentPassageLabel()} · ${DILUTION_LABELS[String(exp)]} dilution · ${hours.toFixed(1)} hr incubation`
   };
   photoPickMode = false;
-  photoPickHint.style.display = "none";
+  setPhotoPrompt(false);
   takePictureBtn.classList.remove("active-toggle");
   renderPeekDishes(incubationProgress);
   openPhotoReviewModal();
@@ -6050,7 +6259,7 @@ function capturePhoto(exp){
 
 function openPhotoReviewModal(){
   photoReviewThumbWrap.innerHTML = "";
-  photoReviewThumbWrap.appendChild(buildDishThumbnailSvg(pendingPhotoCapture.exp, pendingPhotoCapture.progress, 90));
+  photoReviewThumbWrap.appendChild(buildDishThumbnailSvg(pendingPhotoCapture.exp, pendingPhotoCapture.progress, 90, pendingPhotoCapture.colonies));
   photoReviewCaption.textContent = pendingPhotoCapture.autoCaption;
   photoReviewNoteInput.value = "";
   photoReviewOverlay.style.display = "flex";
@@ -6070,6 +6279,7 @@ function savePhotoToNotebook(){
     id: photoIdCounter,
     exp: pendingPhotoCapture.exp,
     progress: pendingPhotoCapture.progress,
+    colonies: pendingPhotoCapture.colonies,
     autoCaption: pendingPhotoCapture.autoCaption,
     userNote: photoReviewNoteInput.value
   });
@@ -6087,7 +6297,7 @@ let currentDetailEntry = null;
 function openPhotoDetailModal(entry){
   currentDetailEntry = entry;
   photoDetailThumbWrap.innerHTML = "";
-  photoDetailThumbWrap.appendChild(buildDishThumbnailSvg(entry.exp, entry.progress, 130));
+  photoDetailThumbWrap.appendChild(buildDishThumbnailSvg(entry.exp, entry.progress, 130, entry.colonies));
   photoDetailCaption.textContent = entry.autoCaption;
   photoDetailNoteInput.value = entry.userNote;
   photoDetailOverlay.style.display = "flex";
@@ -6110,28 +6320,47 @@ photoDetailOverlay.addEventListener("click", (e)=>{ if (e.target===photoDetailOv
 function togglePhotoPickMode(){
   photoPickMode = !photoPickMode;
   if (photoPickMode) turnOffSequencingPickMode(); // a colony click can't mean both "photograph the dish" and "sequence this colony" at once
-  photoPickHint.style.display = photoPickMode ? "block" : "none";
-  photoPickHint.textContent = "Click a plate to photograph it";
+  setPhotoPrompt(photoPickMode);
   takePictureBtn.classList.toggle("active-toggle", photoPickMode);
   renderPeekDishes(incubationProgress);
 }
 
+// While picking, the "Sequence a Colony" button itself becomes the prompt
+// (no extra banner appears), so the window never changes size.
+const SEQ_BTN_IDLE = "🧬 Sequence a Colony";
+const SEQ_BTN_PICKING = "👆 Click a colony on a plate <span class=\"seq-cancel\">✕ cancel</span>";
 function turnOffSequencingPickMode(){
   sequencingPickMode = false;
   sequencingPickHint.style.display = "none";
-  sequenceColonyBtn.classList.remove("active-toggle");
+  sequenceColonyBtn.classList.remove("active-toggle", "seq-picking");
+  sequenceColonyBtn.innerHTML = SEQ_BTN_IDLE;
+}
+// The photo prompt reuses the existing hint line under the heading
+// instead of inserting a new line, for the same reason.
+function setPhotoPrompt(on){
+  photoPickHint.style.display = "none";
+  if (on){
+    if (peekHint.dataset.orig === undefined) peekHint.dataset.orig = peekHint.textContent;
+    peekHint.textContent = "📷 Click a plate to take its picture.";
+    peekHint.classList.add("photo-prompt");
+  } else if (peekHint.dataset.orig !== undefined){
+    peekHint.textContent = peekHint.dataset.orig;
+    delete peekHint.dataset.orig;
+    peekHint.classList.remove("photo-prompt");
+  }
 }
 function toggleSequencingPickMode(){
   sequencingPickMode = !sequencingPickMode;
   if (sequencingPickMode){
-    // A colony click can't mean both "photograph the dish" and "sequence
-    // this colony" at once.
+    // A colony click can't mean both "photograph the dish" and "sequence this colony".
     photoPickMode = false;
-    photoPickHint.style.display = "none";
+    setPhotoPrompt(false);
     takePictureBtn.classList.remove("active-toggle");
   }
-  sequencingPickHint.style.display = sequencingPickMode ? "block" : "none";
+  sequencingPickHint.style.display = "none";
   sequenceColonyBtn.classList.toggle("active-toggle", sequencingPickMode);
+  sequenceColonyBtn.classList.toggle("seq-picking", sequencingPickMode);
+  sequenceColonyBtn.innerHTML = sequencingPickMode ? SEQ_BTN_PICKING : SEQ_BTN_IDLE;
   renderPeekDishes(incubationProgress);
 }
 // Called once an actual colony is clicked while sequencingPickMode is
@@ -6154,6 +6383,7 @@ function pickColonyToSequence(col, dishExp){
 }
 
 function resetIncubateStepUI(){
+  peekDishR = null;
   if (incubationTimer){ clearInterval(incubationTimer); incubationTimer = null; }
   incubationProgress = 0;
   incubationSpeed = 1;
@@ -6372,6 +6602,10 @@ graphCanvas.addEventListener("touchmove", (e)=>{
 }, {passive:false});
 window.addEventListener("touchend", ()=>{ isScrubbingGraph = false; });
 window.addEventListener("touchcancel", ()=>{ isScrubbingGraph = false; });
+// Keep the View Plates window fitting the screen if it's resized.
+window.addEventListener("resize", ()=>{
+  if (peekOverlay.style.display !== "none" && pendingPlatingSession){ peekDishR = null; renderPeekDishes(incubationProgress); }
+});
 
 /* =========================================================
    SEQUENCING ANALYSIS -- reached only by picking a colony while viewing
@@ -6385,7 +6619,35 @@ window.addEventListener("touchcancel", ()=>{ isScrubbingGraph = false; });
 const sequencingOverlay = document.getElementById("sequencingOverlay");
 const sequencingPanelBody = document.getElementById("sequencingPanelBody");
 const closeSequencingBtn = document.getElementById("closeSequencingBtn");
-const skipSequencingAnimationToggle = document.getElementById("skipSequencingAnimationToggle");
+// Sequencing playback mode: "step" (click Next between steps), "auto"
+// (plays straight through), or "skip" (results only). The first run is
+// always step by step; the other two unlock once it's finished.
+let seqRunsCompleted = 0;
+function seqMode(){ const r = document.querySelector('input[name="seqMode"]:checked'); return r ? r.value : "step"; }
+const skipSequencingAnimationToggle = { get checked(){ return seqMode()==="skip"; } };
+function unlockSeqModes(){
+  if (seqRunsCompleted > 0) return;
+  seqRunsCompleted++;
+  document.querySelectorAll('input[name="seqMode"]').forEach(r=>{ r.disabled = false; });
+  const auto = document.querySelector('input[name="seqMode"][value="auto"]'); if (auto) auto.checked = true;
+  const hint = document.getElementById("seqModeHint"); if (hint) hint.style.display = "none";
+}
+// Step mode: adds a "Next step" button and waits for the student to click it.
+function seqNext(tok, label){
+  if (seqMode() !== "step") return Promise.resolve();
+  const btn = sequencingPanelBody.querySelector(".seq-next-slot .seq-next-btn");
+  if (!btn) return Promise.resolve();
+  return new Promise((resolve, reject)=>{
+    btn.textContent = label || "Next step →";
+    btn.style.visibility = "visible";
+    btn.onclick = ()=>{
+      btn.onclick = null;
+      btn.style.visibility = "hidden";
+      if (seqCancelled(tok)) reject(new Error("seq-cancelled")); else resolve();
+    };
+    btn.focus({ preventScroll:true });
+  });
+}
 
 // Mutation-effect badge colors. Deliberately NOT reused for DNA bases
 // (see BASE_COLORS), so a base's color never looks like it "means"
@@ -6639,6 +6901,15 @@ async function runIlluminaAnimation(variants, tok){
   statusLine.setAttribute("aria-live", "polite");
   sequencingPanelBody.appendChild(statusLine);
   const svg = makeSequencingSvg("0 0 320 230", 230);
+  // Fixed-height slot for the "Next step" button, present for the whole
+  // animation (button hidden, not removed, between steps) so the panel
+  // never changes size from step to step.
+  const nextSlot = document.createElement("div");
+  nextSlot.className = "seq-next-slot";
+  const nextBtn = document.createElement("button");
+  nextBtn.type = "button"; nextBtn.className = "confirm-btn seq-next-btn"; nextBtn.style.visibility = "hidden";
+  nextSlot.appendChild(nextBtn);
+  sequencingPanelBody.appendChild(nextSlot);
   const FRAG_X = [50,105,160,215,270];
   const DNA = "#3a3226", ADAPTER = "#f783ac";
 
@@ -6649,6 +6920,7 @@ async function runIlluminaAnimation(variants, tok){
   await seqWait(1300, tok);
 
   // 2. Fragment
+  await seqNext(tok);
   setStage(statusLine, 2, "Cutting the DNA into many short pieces...");
   whole.style.opacity = "0";
   await seqWait(300, tok);
@@ -6657,6 +6929,7 @@ async function runIlluminaAnimation(variants, tok){
   await seqWait(1000, tok);
 
   // 3. Adapters
+  await seqNext(tok);
   setStage(statusLine, 3, "Adding adapters -- short tags of known DNA -- to both ends of every piece...");
   FRAG_X.forEach((x,i)=>{
     [x-23, x+19].forEach(ax=>{
@@ -6668,6 +6941,7 @@ async function runIlluminaAnimation(variants, tok){
   await seqWait(1300, tok);
 
   // 4. Flow cell + cluster amplification
+  await seqNext(tok);
   setStage(statusLine, 4, "The tagged pieces stick to a glass flow cell, and each one is copied in place into a cluster of identical copies...");
   svg.appendChild(svgEl("rect", { x:15, y:150, width:290, height:60, rx:6, fill:"#eef4f2", stroke:"#b7d3ca", "stroke-width":2 }));
   svg.appendChild(svgText(160, 224, "flow cell", { "text-anchor":"middle", "font-size":9, fill:"#6c7a74" }));
@@ -6689,6 +6963,7 @@ async function runIlluminaAnimation(variants, tok){
   await seqWait(500, tok);
 
   // 5. Sequencing by synthesis
+  await seqNext(tok);
   setStage(statusLine, 5, "Reading the DNA: each round, every cluster lights up with the color of its next DNA letter. A camera records the colors, which spell out the DNA.");
   svg.innerHTML = "";
   svg.appendChild(svgEl("rect", { x:15, y:30, width:290, height:110, rx:6, fill:"#1f2326" }));
@@ -6726,6 +7001,7 @@ async function runIlluminaAnimation(variants, tok){
   await seqWait(400, tok);
 
   // 6. Align reads to the reference
+  await seqNext(tok);
   setStage(statusLine, 6, "A computer finds where each read belongs in the ancestor's DNA. The reads overlap, so every DNA letter gets read many times.");
   svg.innerHTML = "";
   svg.appendChild(svgEl("rect", { x:20, y:40, width:280, height:8, rx:4, fill:"#c9b98a" }));
@@ -6743,10 +7019,11 @@ async function runIlluminaAnimation(variants, tok){
   await seqWait(1000, tok);
 
   // 7. Compare to the ancestor (variant calling)
+  await seqNext(tok);
   setStage(statusLine, 7, "Comparing the reads to the ancestor, letter by letter. A real mutation shows up in EVERY read at the same spot. One odd letter in one read is just a reading mistake.");
   svg.innerHTML = "";
   drawPileup(svg, variants);
-  await seqWait(4200, tok);
+  if (seqMode()==="step") await seqNext(tok, "See results →"); else await seqWait(4200, tok);
 }
 
 // Zoomed-in view of 11 DNA letters: the reference on top, six overlapping
@@ -6803,6 +7080,7 @@ function drawPileup(svg, variants){
 
 // ---- Results ----
 function showSequencingResults(variants, dishExp, prediction){
+  unlockSeqModes();
   sequencingStage = "results";
   clearPanelBody();
   const outcome = outcomeForVariants(variants);
